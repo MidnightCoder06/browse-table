@@ -1,0 +1,7 @@
+{
+  "env": {
+    "MONGO_USER": "j_money_001",
+    "MONGO_PASSWORD": "cA8VQWmUkjuTMwvr",
+    "MONGO_DB": "BROWSE-TABLE"
+  }
+}

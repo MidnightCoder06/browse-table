@@ -2,10 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser'); // extract json from incoming requests
 const { graphqlHTTP } = require('express-graphql'); // graphqlHttp is not a function w/o {} ... not a default vs. named import thing
 const { buildSchema } = require('graphql'); // generates graphql schema from the passed in strings ... using backtickets / template string (also called template literal) ... for a multiline string
+const mongoose = require('mongoose')
+
+const Event = require('./models/event')
 
 const app = express();
-
-const events = []; // temporary global variable / 'in-memory'
 
 app.use(bodyParser.json());
 
@@ -36,6 +37,17 @@ app.use(bodyParser.json());
 // note the resolvers names must match the query and / or mutation
 
 // input is a special keyword to define the type of arguments
+
+
+
+
+// mongodb will automatically create an id
+// must return the promise so nodejs knows it is async. you're telling it not to return to early
+// save method is given to us by mongoose ... it hits the database and performs a write operation
+
+// method given to us by mongoose to make sure we are returning what we want
+// the result without this is enriched
+
 app.use('/graphql', graphqlHTTP({
   schema: buildSchema(`
       type Event {
@@ -68,31 +80,51 @@ app.use('/graphql', graphqlHTTP({
     `),
     rootValue: {
       events: () => {
-        return events
+        return Event.find().then(events => {
+          return events.map(event => {
+            return { ...event._doc };
+          });
+        })
+        .catch(err => {
+          throw err;
+        });
       },
-      createEvent: (args) => {
-        const event = {
-          _id: Math.random().toString(),
+      createEvent: args => {
+        const event = new Event({
           title: args.eventInput.title,
           description: args.eventInput.description,
           price: args.eventInput.price,
-          date: args.eventInput.date
-        };
-        events.push(event);
-        return event;
+          date: new Date(args.eventInput.date)
+        })
+        return event.save().then(result => {
+          console.log(result);
+          return { ...result._doc };
+        })
+        .catch(err => {
+          console.log(err);
+          throw err;
+        });
       }
     },
     graphiql: true
   })
 );
 
-app.listen(3000);
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@browsetablecluster.9b21n.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true})
+  .then(() => {
+    console.log('sucessful connection to database')
+    app.listen(3000);
+  }).catch(err => {
+    console.log(err);
+    throw err;
+  });
 
+  // app.listen(3000);
 
 /* example of what you can do in the graphiql playground
 
 mutation {
-  createEvent(eventInput: {title:"hi", description:"hoe", price: 12.1, date:"N/A!"}) {
+  createEvent(eventInput: {title:"hi", description:"hoe", price: 12.1, date:"2021-02-05T04:09:02.525Z"}) {
     title
   }
 }
@@ -103,5 +135,16 @@ query {
     price
   }
 }
+
+*/
+
+/*
+
+Historical note:
+
+Graphql used to not be able to handle the ObjectId value that was coming from MongoDB and you had to explictly
+covert it to a string like this:
+
+  return { ...event._doc, _id: event._doc._id.toString() };
 
 */
