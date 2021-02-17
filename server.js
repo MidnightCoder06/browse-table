@@ -2,9 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser'); // extract json from incoming requests
 const { graphqlHTTP } = require('express-graphql'); // graphqlHttp is not a function w/o {} ... not a default vs. named import thing
 const { buildSchema } = require('graphql'); // generates graphql schema from the passed in strings ... using backtickets / template string (also called template literal) ... for a multiline string
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const Event = require('./models/event')
+const Event = require('./models/event');
+const User = require('./models/user');
 
 const app = express();
 
@@ -39,14 +41,14 @@ app.use(bodyParser.json());
 // input is a special keyword to define the type of arguments
 
 
-
-
 // mongodb will automatically create an id
 // must return the promise so nodejs knows it is async. you're telling it not to return to early
 // save method is given to us by mongoose ... it hits the database and performs a write operation
 
 // method given to us by mongoose to make sure we are returning what we want
 // the result without this is enriched
+
+// the password for User is nullable because that is not something we should ever return
 
 app.use('/graphql', graphqlHTTP({
   schema: buildSchema(`
@@ -58,11 +60,22 @@ app.use('/graphql', graphqlHTTP({
         date: String!
       }
 
+      type User {
+        _id: ID!
+        email: String!
+        password: String
+      }
+
       input EventInput {
         title: String!
         description: String!
         price: Float!
         date: String!
+      }
+
+      input UserInput {
+        email: String!
+        password: String!
       }
 
       type RootQuery {
@@ -71,6 +84,7 @@ app.use('/graphql', graphqlHTTP({
 
       type RootMutation {
         createEvent(eventInput: EventInput): Event
+        createUser(userInput: UserInput): User
       }
 
       schema {
@@ -104,6 +118,27 @@ app.use('/graphql', graphqlHTTP({
           console.log(err);
           throw err;
         });
+      },
+      createUser: args => {
+        return User.findOne({ email: args.userInput.email }).then(user => {
+          if (user) {
+            throw new Error('user exists already');
+          }
+          return bcrypt.hash(args.userInput.password, 12);
+        })
+          .then(hashedPassword => {
+            const user = new User({
+              email: args.userInput.email,
+              password: hashedPassword
+            });
+            return user.save();
+          })
+          .then(result => {
+            return { ...result._doc, password: null, _id: result.id }
+          })
+          .catch(err => {
+            throw err;
+          });
       }
     },
     graphiql: true
@@ -133,6 +168,13 @@ query {
   events {
     title
     price
+  }
+}
+
+mutation {
+  createUser(userInput: {email: 'test@test.com', password: 'tester'}) {
+    email
+    password
   }
 }
 
