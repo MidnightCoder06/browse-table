@@ -50,6 +50,78 @@ app.use(bodyParser.json());
 
 // the password for User is nullable because that is not something we should ever return
 
+/*
+
+Graphql works were if you have a field that are quering and it is a string or an object for exmaple
+then it will give that to you. If assign the value of the field you are trying to return a function
+then graphql will automatically call that function for you and assign what it returns to the key.
+
+Not an infinite loop because only called if requested
+
+*/
+
+const eventsFetchedById = eventIds => {
+  return Event.find({ _id: {$in: eventIds } })
+    .then(events => {
+      return events.map(event => {
+        return {
+          ...event._doc,
+          _id: event.id,
+          creator: userFetchedById.bind(this, event.creator)
+        };
+      });
+    })
+    .catch(err => {
+      throw err;
+    });
+};
+
+const userFetchedById = userId => {
+  return User.findById(userId).then(user => {
+    return {
+      ...user._doc,
+      _id: user.id,
+      createdEvents: eventsFetchedById.bind(this, user._doc.createdEvents)
+    };
+  })
+  .catch(err => {
+    throw err;
+  });
+};
+
+/*
+
+example query's the above functions make possible:
+
+query {
+  events {
+    creator {
+      email
+      createdEvents {
+        title
+      }
+    }
+  }
+}
+
+query {
+  events {
+    creator {
+      email
+      createdEvents {
+        title
+        creator {
+          email
+        }
+      }
+    }
+  }
+}
+
+
+
+*/
+
 app.use('/graphql', graphqlHTTP({
   schema: buildSchema(`
       type Event {
@@ -58,12 +130,14 @@ app.use('/graphql', graphqlHTTP({
         description: String!
         price: Float!
         date: String!
+        creator: User!
       }
 
       type User {
         _id: ID!
         email: String!
         password: String
+        createdEvents: [Event!]
       }
 
       input EventInput {
@@ -96,7 +170,11 @@ app.use('/graphql', graphqlHTTP({
       events: () => {
         return Event.find().then(events => {
           return events.map(event => {
-            return { ...event._doc };
+            return {
+              ...event._doc,
+              _id: event.id,
+              creator: userFetchedById.bind(this, event._doc.creator)
+            };
           });
         })
         .catch(err => {
@@ -115,7 +193,11 @@ app.use('/graphql', graphqlHTTP({
         return event
           .save()
           .then(result => {
-            createdEvent = { ...result._doc, _id: result._doc._id.toString() };
+            createdEvent = {
+              ...result._doc,
+              _id: result._doc._id.toString(),
+              creator: userFetchedById.bind(this, result._doc.creator)
+            };
             return User.findById('602c9ea2207b0404e8a90770')
         })
         .then(user => {
@@ -173,7 +255,7 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PA
 /* example of what you can do in the graphiql playground
 
 mutation {
-  createEvent(eventInput: {title:"hi", description:"hoe", price: 12.1, date:"2021-02-05T04:09:02.525Z"}) {
+  createEvent(eventInput: {title:"hi...", description:"hoe....", price: 12.19, date:"2021-02-05T04:09:02.525Z"}) {
     title
   }
 }
@@ -189,6 +271,15 @@ mutation {
   createUser(userInput: {email: 'test@test.com', password: 'tester'}) {
     email
     password
+  }
+}
+
+mutation {
+  createEvent(eventInput: {title:"more_complexity", description:"ass", price: 12.98, date:"2021-02-05T04:09:02.525Z"}) {
+    title
+    creator {
+      email
+    }
   }
 }
 
