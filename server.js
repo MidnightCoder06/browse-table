@@ -43,13 +43,14 @@ query {
 
 mutation {
   createUser(userInput: {email: 'test@test.com', password: 'tester'}) {
+    _id
     email
     password
   }
 }
 
 mutation {
-  createEvent(eventInput: {title:"more_complexity", description:"ass", price: 12.98, date:"2021-02-05T04:09:02.525Z"}) {
+  createEvent(eventInput: {title:"love the complexity", description:"fun times", price: 12.98, date:"2021-02-05T04:09:02.525Z"}) {
     title
     creator {
       email
