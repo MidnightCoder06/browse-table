@@ -3,6 +3,9 @@ const { buildSchema } = require('graphql'); // generates graphql schema from the
 
 /*
 
+An id is automatically added by mongoose
+for bookings both createdAt and updatedAt are created automatically by mongoose
+
 schema & query & mutation are three keywords that buildSchema is looking for ... based on the graphql specification
 *query is fetching data
 *mutations is changing data (creating, updating, deleting)
@@ -30,6 +33,14 @@ the password for User is nullable because that is not something we should ever r
 */
 
 module.exports = buildSchema(`
+    type Booking {
+      _id: ID!
+      event: Event!
+      user: User!
+      createdAt: String!
+      updatedAt: String!
+    }
+
     type Event {
       _id: ID!
       title: String!
@@ -65,6 +76,8 @@ module.exports = buildSchema(`
     type RootMutation {
       createEvent(eventInput: EventInput): Event
       createUser(userInput: UserInput): User
+      bookEvent(eventId: ID!): Booking!
+      cancelBooking(bookingId: ID!): Event!
     }
 
     schema {
