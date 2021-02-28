@@ -2,8 +2,6 @@ const Event = require('../../models/event');
 const Booking = require('../../models/booking');
 const { transformBooking, transformEvent } = require('./merge');
 
-// TODO: investigate of querying list of bookings is broken
-
 module.exports = {
   bookings: async () => {
     try {
@@ -70,6 +68,26 @@ mutation {
         "email": "test@test.com"
       }
     }
+  }
+}
+
+query {
+  bookings {
+    _id,
+    createdAt,
+    updatedAt
+  }
+}
+
+{
+  "data": {
+    "bookings": [
+      {
+        "_id": "603bfc72136f482fac6882cf",
+        "createdAt": "2021-02-28T20:26:26.899Z",
+        "updatedAt": "2021-02-28T20:26:26.899Z"
+      }
+    ]
   }
 }
 

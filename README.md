@@ -21,7 +21,7 @@ This makes the code look like its running synchronously but it is actually still
 
 
 TODO:
-- write tests (unit, integration, end-to-end)
+- write tests (unit, integration, end-to-end) (for both front-end and back-end) (use postman)
 - more sophisticated error handling
 - once add the front-end make sure you use typescript with react
 - once hosted on AWS have them handle user authentication https://aws.amazon.com/cognito/
