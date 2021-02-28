@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// TODO: rename to user and abstract auth logic to a different file
 const User = require('../../models/user');
 
 module.exports = {
@@ -23,8 +23,27 @@ module.exports = {
     } catch (err) {
       throw err;
     }
+  },
+  login: async ({ email, password }) => {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error('User does not exist!');
+    }
+    const isEqual = await bcrypt.compare(password, user.password);
+    if (!isEqual) {
+      throw new Error('Password is incorrect!');
+    }
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      'secretkeythatmustbekeptonserverandawayfromclient',
+      {
+        expiresIn: '1h'
+      }
+    );
+    return { userId: user.id, token: token, tokenExpiration: 1 };
   }
 };
+
 
 /*
 
@@ -41,6 +60,14 @@ mutation {
       "_id": "603bf6b75b11882f264573ab",
       "email": "test@test.com"
     }
+  }
+}
+
+query {
+  login(email: "test@test.com", password: "lskajf") {
+    userId,
+    token,
+    tokenExpiration
   }
 }
 

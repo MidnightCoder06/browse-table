@@ -18,10 +18,14 @@ The async-await pattern is being used here instead of promise chaining.
 This uses less returns b/c top most promise is implicitly returned.
 This makes the code look like its running synchronously but it is actually still using promises under the hood.
 
+I am storing the auth token (`jsonwebtoken`) on the client, not storing it in the server.
+The client is storing it and attaching it to subsequent requests.
+The server confirms the token is valid.
+The `tokenExpiration` is measured in terms of hours.
+Using a middleware function to take the token from the client and decide whether to block the incoming request or not / what resolvers it can access.
 
 
 TODO:
 - write tests (unit, integration, end-to-end) (for both front-end and back-end) (use postman)
 - more sophisticated error handling
 - once add the front-end make sure you use typescript with react
-- once hosted on AWS have them handle user authentication https://aws.amazon.com/cognito/
