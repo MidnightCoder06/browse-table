@@ -28,4 +28,6 @@ Using a middleware function to take the token from the client and decide whether
 TODO:
 - write tests (unit, integration, end-to-end) (for both front-end and back-end) (use postman)
 - more sophisticated error handling
+- use environment variable so the key isn't in plain text exposed on github
+- implement security lessons learned from Adobe security training
 - once add the front-end make sure you use typescript with react
