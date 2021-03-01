@@ -1,5 +1,7 @@
 Dev Notes:
 
+# Backend
+
 Everything in GraphQl runs through a single endpoint, commonly called 'graphql'
 
 The graphql language is a typed query language ... you execute a query to fetch data from that endpoint
@@ -24,8 +26,13 @@ The server confirms the token is valid.
 The `tokenExpiration` is measured in terms of hours.
 Using a middleware function to take the token from the client and decide whether to block the incoming request or not / what resolvers it can access.
 
+# Frontend
 
-TODO:
+npx create-react-app .  
+The dot is needed when you have cd into a folder (not the root)
+
+# TODO:
+
 - write tests (unit, integration, end-to-end) (for both front-end and back-end) (use postman)
 - more sophisticated error handling
 - use environment variable so the key isn't in plain text exposed on github
