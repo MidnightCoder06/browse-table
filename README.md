@@ -31,8 +31,19 @@ Using a middleware function to take the token from the client and decide whether
 npx create-react-app .  
 The dot is needed when you have cd into a folder (not the root)
 
+Using `react-router-dom` for routing.
+
+Modern Web Applications are also called Single Page Applications. What does this mean?
+
+In the past, when browsers were much less capable than today, and JavaScript performance was poor, every page was coming from a server. Every time you clicked something, a new request was made to the server and the browser subsequently loaded the new page.
+
+Today, popularized by modern frontend JavaScript frameworks like React, an app is usually built as a single page application: you only load the application code (HTML, CSS, JavaScript) once, and when you interact with the application, what generally happens is that JavaScript intercepts the browser events and instead of making a new request to the server that then returns a new document, the client requests some JSON or performs an action on the server but the page that the user sees is never completely wiped away, and behaves more like a desktop application.
+
+Single page applications are built in JavaScript (or at least compiled to JavaScript) and work in the browser.
+
 # TODO:
 
+- add a custom 404 page
 - write tests (unit, integration, end-to-end) (for both front-end and back-end) (use postman)
 - more sophisticated error handling
 - use environment variable so the key isn't in plain text exposed on github
