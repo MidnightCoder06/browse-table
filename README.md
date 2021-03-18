@@ -51,4 +51,5 @@ Single page applications are built in JavaScript (or at least compiled to JavaSc
 - once add the front-end make sure you use typescript with react
 - use scss instead of css
 - aria labels and tab indexing for accessibility
-- lottie for animations 
+- lottie for animations
+- persist the token in local storage to avoid a logout occurring on refresh 

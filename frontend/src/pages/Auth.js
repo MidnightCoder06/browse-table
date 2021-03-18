@@ -1,12 +1,14 @@
 // TODO: use Apollo instead of fetch
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
+import AuthContext from '../context/auth-context';
 import './Auth.css'
 
 
 function AuthPage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const authContext = useContext(AuthContext);
   const emailEl = useRef(null);
   const passwordEl = useRef(null);
 
@@ -26,7 +28,17 @@ function AuthPage() {
       return;
     }
 
-    let requestBody;
+    let requestBody = {
+      query: `
+        query {
+          login(email: "${email}", password: "${password}") {
+            userId
+            token
+            tokenExpiration
+          }
+        }
+      `
+    };
 
     if (!isLoggedIn) {
       requestBody = {
@@ -39,20 +51,7 @@ function AuthPage() {
           }
         `
       };
-    } else {
-      requestBody = {
-        query: `
-          query {
-            login(email: "${email}", password: "${password}") {
-              userId
-              token
-              tokenExpiration
-            }
-          }
-        `
-      };
     }
-
 
   fetch('http://localhost:8000/graphql', {
       method: 'POST',
@@ -68,10 +67,16 @@ function AuthPage() {
         return res.json();
       })
       .then(resData => {
-        console.log(resData);
+        if (resData.data.login.token) {
+          authContext.login(
+            resData.data.login.token,
+            resData.data.login.userId,
+            resData.data.login.tokenExpiration
+          );
+        }
       })
       .catch(err => {
-        console.log(err);
+        console.log(err); // TypeError: Cannot read property 'token' of undefined
       });
   };
 
