@@ -9,7 +9,18 @@ const isAuth = require('./middleware/is-auth');
 
 const app = express();
 app.use(bodyParser.json());
-// this passes isAuth to the entire app so any file can use it 
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // any client can send requests to this server. this is needed since the frontend is on a different server and we want to avoid cors policy errors
+  res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS'); // by default on a post request the browser also send 'options' to check if it is allowed or not so you have to allow 'options' as well
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200); // our api can't handle options right now so explictly tell it that this is ok
+  }
+  next(); // allow the request to continue its journey
+});
+
+// this passes isAuth to the entire app so any file can use it
 app.use(isAuth);
 
 
@@ -23,7 +34,7 @@ app.use('/graphql', graphqlHTTP({
 mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@browsetablecluster.9b21n.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true})
   .then(() => {
     console.log('sucessful connection to database')
-    app.listen(3000);
+    app.listen(8000); // frontend is port 3000, avoid a collision 
   }).catch(err => {
     console.log(err);
     throw err;
