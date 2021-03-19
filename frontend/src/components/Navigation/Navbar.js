@@ -9,9 +9,11 @@ import AuthContext from '../../context/auth-context';
 // TODO: convert to scss
 import './Navbar.css';
 
+// passing a reference to the logout method to the onClick listener
 const Navbar = props => (
   <AuthContext.Consumer>
     {context => {
+      console.log("context in navbar", context) // {token: null, userId: null, login: ƒ, logout: ƒ}
       return (
         <header className="main-navigation">
           <div className="main-navigation__logo">
@@ -28,9 +30,14 @@ const Navbar = props => (
                 <NavLink to="/events">Events</NavLink>
               </li>
               {context.token && (
-                <li>
-                  <NavLink to="/bookings">Bookings</NavLink>
-                </li>
+                <>
+                  <li>
+                    <NavLink to="/bookings">Bookings</NavLink>
+                  </li>
+                  <li>
+                    <button onClick={context.logout}>Logout</button>
+                  </li>
+                </>
               )}
             </ul>
           </nav>

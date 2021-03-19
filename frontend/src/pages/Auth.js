@@ -7,8 +7,9 @@ import './Auth.css'
 
 function AuthPage() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // initial value of true causes createUser instead of login to be the requestBody  
   const authContext = useContext(AuthContext);
+  console.log("initial load", authContext) // {token: null, userId: null, login: ƒ, logout: ƒ}
   const emailEl = useRef(null);
   const passwordEl = useRef(null);
 
@@ -20,11 +21,12 @@ function AuthPage() {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    console.log('submit', isLoggedIn)
+    console.log('submit pressed... loggedIn?', isLoggedIn) // false
     const email = emailEl.current.value;
     const password = passwordEl.current.value;
 
     if (email.trim().length === 0 || password.trim().length === 0) {
+      console.log('a required field is empty')
       return;
     }
 
@@ -67,16 +69,29 @@ function AuthPage() {
         return res.json();
       })
       .then(resData => {
+        console.log('resData', resData)
+        /*
+        resData
+            {data: {…}}
+
+            data:
+              createUser:
+                email: "jean.leconte14@stjohns.eduuiuio"
+                _id: "6053e454810b03174d87cb12"
+        */
         if (resData.data.login.token) {
+          console.log('in if block') // doesn't execute
           authContext.login(
             resData.data.login.token,
             resData.data.login.userId,
             resData.data.login.tokenExpiration
           );
+        } else {
+          console.log('no login') // doesn't execute
         }
       })
       .catch(err => {
-        console.log(err); // TypeError: Cannot read property 'token' of undefined
+        console.log('catch block', err); // TODO: fix bug -> TypeError: Cannot read property 'token' of undefined
       });
   };
 
