@@ -19,12 +19,12 @@ function EventsPage() {
   }, [])
 
   const createEventHandler = () => {
-    console.log('create');
+    console.log('create'); // this runs
     setCreatingEvent(true);
   }
 
   const onPressConfirm = () => {
-    console.log('confirm');
+    console.log('confirm'); // this runs
     setCreatingEvent(false);
     const title = titleEl.current.value;
     const price = priceEl.current.value;
@@ -61,6 +61,7 @@ function EventsPage() {
     };
 
     const token = authContext.token;
+    console.log("token in events.js ->", token) // runs and logs sucessfully
 
     fetch('http://localhost:8000/graphql', {
       method: 'POST',
@@ -72,7 +73,7 @@ function EventsPage() {
     })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
+          throw new Error('Failed to create event!');
         }
         return res.json();
       })
@@ -83,9 +84,11 @@ function EventsPage() {
         console.log(err);
       });
   };
+  // {title: "Hello", price: "89.1", date: "2021-04-24T19:52", description: "Victory"}
+  // Events are being sucessfully created 
 
   const onPressCancel = () => {
-    console.log('cancel');
+    console.log('cancel'); // runs but then ... Events.js:115 POST http://localhost:8000/graphql net::ERR_CONNECTION_REFUSED
     setCreatingEvent(false);
   }
 
@@ -117,13 +120,16 @@ function EventsPage() {
     })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
+          throw new Error('Failed to fetch events!');
+          // TODO: fix this ... it hits this error
+          // Events.js:111 POST http://localhost:8000/graphql net::ERR_CONNECTION_REFUSED
+          // TypeError: Failed to fetch
         }
         return res.json();
       })
       .then(resData => {
         const events = resData.data.events;
-        console.log('setting events', events)
+        console.log('setting events', events) // an empty array??
         setEvents(events);
       })
       .catch(err => {

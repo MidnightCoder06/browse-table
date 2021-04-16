@@ -40,6 +40,7 @@ module.exports = {
         expiresIn: '1h'
       }
     );
+    console.log("userID:", user.id, "token:", token)
     return { userId: user.id, token: token, tokenExpiration: 1 };
   }
 };

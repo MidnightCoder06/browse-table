@@ -4,7 +4,6 @@ import React, { useState, useRef, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 import './Auth.css'
 
-
 function AuthPage() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false); // initial value of true causes createUser instead of login to be the requestBody
@@ -92,6 +91,8 @@ function AuthPage() {
       })
       .catch(err => {
         console.log('catch block', err); // TODO: fix bug -> TypeError: Cannot read property 'token' of undefined
+        // is this even a bug?? You're just creating a user ... in the backend you aren't returning a token on purpose?
+        // only login does that
       });
   };
 
