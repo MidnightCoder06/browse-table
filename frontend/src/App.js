@@ -4,7 +4,7 @@ import AuthPage from './pages/Auth';
 import BookingsPage from './pages/Bookings';
 import EventsPage from './pages/Events';
 import Navbar from './components/Navigation/Navbar';
-import AuthContext from './context/auth-context';
+import AuthContext from './context/AuthContext';
 import './App.css';
 
 function App() {
@@ -22,6 +22,7 @@ function App() {
     setUserId(null);
   };
 
+  // every context object comes with a Provider React component that allows consuming components to subscribe to context changes.
   return (
     <BrowserRouter>
       <>

@@ -5,7 +5,7 @@ import React from 'react';
 // this is an jsx element so can't be targeted by css but it renders an archor tag so you can use that to target it from css
 // this will add .active class ... seperate from the :active and :hover default css classes
 import { NavLink } from 'react-router-dom';
-import AuthContext from '../../context/auth-context';
+import AuthContext from '../../context/AuthContext';
 // TODO: convert to scss
 import './Navbar.css';
 

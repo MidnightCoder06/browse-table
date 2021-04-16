@@ -6,10 +6,11 @@ Everything in GraphQl runs through a single endpoint, commonly called 'graphql'
 
 The graphql language is a typed query language ... you execute a query to fetch data from that endpoint
 
-Run this project on localhost 3000 via nodemon which will automatically restart the server for you when code changes are made
+Run this project on localhost 8000 via nodemon which will automatically restart the server for you when code changes are made
+	run `npm start` at the root
 
 express-graphQl package connects schemas and resolvers
-	It also ships with `graphiql: true` so you can visit http://localhost:3000/graphql and play with the api
+	It also ships with `graphiql: true` so you can visit http://localhost:8000/graphql and play with the api
 
 I am using bcryptjs to hash the passwords so they aren't stored in plain text in the database
 2 args -> 1. is the password and 2. is the salt length
@@ -41,6 +42,8 @@ Today, popularized by modern frontend JavaScript frameworks like React, an app i
 
 Single page applications are built in JavaScript (or at least compiled to JavaScript) and work in the browser.
 
+Run `npm start` in the frontend folder 
+
 # TODO:
 
 - add a custom 404 page
@@ -52,4 +55,4 @@ Single page applications are built in JavaScript (or at least compiled to JavaSc
 - use scss instead of css
 - aria labels and tab indexing for accessibility
 - lottie for animations
-- persist the token in local storage to avoid a logout occurring on refresh 
+- persist the token in local storage to avoid a logout occurring on refresh

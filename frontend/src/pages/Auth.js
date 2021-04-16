@@ -1,13 +1,13 @@
 // TODO: use Apollo instead of fetch
 
 import React, { useState, useRef, useContext } from 'react';
-import AuthContext from '../context/auth-context';
+import AuthContext from '../context/AuthContext';
 import './Auth.css'
 
 
 function AuthPage() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // initial value of true causes createUser instead of login to be the requestBody  
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // initial value of true causes createUser instead of login to be the requestBody
   const authContext = useContext(AuthContext);
   console.log("initial load", authContext) // {token: null, userId: null, login: ƒ, logout: ƒ}
   const emailEl = useRef(null);
