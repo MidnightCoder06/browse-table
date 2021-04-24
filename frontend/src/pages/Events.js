@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import Modal from '../components/Modal/Modal';
 import Backdrop from '../components/Backdrop/Backdrop';
 import AuthContext from '../context/AuthContext';
+import EventList from '../components/Events/EventList';
 import './Events.css';
 
 function EventsPage() {
@@ -153,14 +154,6 @@ function EventsPage() {
     setEvents(hardCodedEvents)
   }
 
-  // const eventList = events.map(event => {
-  // key={event._id}
-  const eventList = events.map((event, idx) =>
-      <li key={idx} className="events__list-item">
-        {event.title}
-      </li>
-    );
-
   return (
     <>
       {creatingEvent && <Backdrop />}
@@ -210,7 +203,7 @@ function EventsPage() {
         Create Event
       </button>
     </div>
-      <ul className="events__list">{eventList}</ul>
+    <EventList events={events} />
     </>
   );
 }
