@@ -41,6 +41,7 @@ function AuthPage() {
       `
     };
 
+    // you must create a user before you can you can login
     if (!isLoggedIn) {
       requestBody = {
         query: `
@@ -78,7 +79,7 @@ function AuthPage() {
                 email: "jean.leconte14@stjohns.eduuiuio"
                 _id: "6053e454810b03174d87cb12"
         */
-        if (resData.data.login.token) {
+        if (resData.data.login && resData.data.login.token) {
           console.log('in if block') // doesn't execute
           authContext.login(
             resData.data.login.token,

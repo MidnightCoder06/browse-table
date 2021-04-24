@@ -14,9 +14,12 @@ function EventsPage() {
   const descriptionEl = useRef();
   const authContext = useContext(AuthContext);
 
+/*
   useEffect(() => {
     fetchEvents();
-  }, [])
+  }) // get rid of this second argument and see if that fixes bug?
+    // nope... still failed to fetch the events
+*/
 
   const createEventHandler = () => {
     console.log('create'); // this runs
@@ -78,6 +81,10 @@ function EventsPage() {
         return res.json();
       })
       .then(resData => {
+        console.log("resData from event creation", resData)
+        // data: {createEvent: null}
+        // errors: Array(1) -> message: "User not found." -> this is probably because you are hardcoding the creator
+        // once you swapped out the hard coded value events can be created now but you still can't fetch them for some reason
         fetchEvents();
       })
       .catch(err => {
@@ -85,7 +92,7 @@ function EventsPage() {
       });
   };
   // {title: "Hello", price: "89.1", date: "2021-04-24T19:52", description: "Victory"}
-  // Events are being sucessfully created 
+  // Events are being sucessfully created
 
   const onPressCancel = () => {
     console.log('cancel'); // runs but then ... Events.js:115 POST http://localhost:8000/graphql net::ERR_CONNECTION_REFUSED
@@ -93,6 +100,7 @@ function EventsPage() {
   }
 
   const fetchEvents = () => {
+    /*
     const requestBody = {
       query: `
           query {
@@ -111,19 +119,22 @@ function EventsPage() {
         `
     };
 
+    const token = authContext.token;
+
     fetch('http://localhost:8000/graphql', {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token
       }
     })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed to fetch events!');
+          throw new Error('Failed to fetch events!', res);
           // TODO: fix this ... it hits this error
           // Events.js:111 POST http://localhost:8000/graphql net::ERR_CONNECTION_REFUSED
-          // TypeError: Failed to fetch
+          // TypeError: Failed to fetch -> 500
         }
         return res.json();
       })
@@ -135,15 +146,20 @@ function EventsPage() {
       .catch(err => {
         console.log(err);
       });
+    */
+
+    // hardcoding for now until that 500 error is figured out
+    const hardCodedEvents = [{title: "Hello", price: "89.1", date: "2021-04-24T19:52", description: "Victory"}]
+    setEvents(hardCodedEvents)
   }
 
-  const eventList = events.map(event => {
-      return (
-        <li key={event._id} className="events__list-item">
-          {event.title}
-        </li>
-      );
-    });
+  // const eventList = events.map(event => {
+  // key={event._id}
+  const eventList = events.map((event, idx) =>
+      <li key={idx} className="events__list-item">
+        {event.title}
+      </li>
+    );
 
   return (
     <>
@@ -180,14 +196,20 @@ function EventsPage() {
           </form>
         </Modal>
       )}
-      {authContext.token && (
+    {/*  {authContext.token && (
       <div className="events-control">
         <p>Share your own Events!</p>
         <button className="btn" onClick={createEventHandler}>
           Create Event
         </button>
       </div>
-    )}
+    )} */}
+    <div className="events-control">
+      <p>Share your own Events!</p>
+      <button className="btn" onClick={createEventHandler}>
+        Create Event
+      </button>
+    </div>
       <ul className="events__list">{eventList}</ul>
     </>
   );
