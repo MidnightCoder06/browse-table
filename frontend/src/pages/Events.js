@@ -9,6 +9,8 @@ function EventsPage() {
 
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // TODO: use react-spectrum progress circle for this
   const titleEl = useRef();
   const priceEl = useRef();
   const dateEl = useRef();
@@ -46,6 +48,7 @@ function EventsPage() {
     const event = { title, price, date, description };
     console.log(event);
 
+    // todo: remove the creator field as he does?
     const requestBody = {
       query: `
           mutation {
@@ -87,6 +90,20 @@ function EventsPage() {
         // errors: Array(1) -> message: "User not found." -> this is probably because you are hardcoding the creator
         // once you swapped out the hard coded value events can be created now but you still can't fetch them for some reason
         fetchEvents();
+        // setEvents(prevState => {
+        //   const updatedEvents = [...prevState]
+        //   updatedEvents.push({
+        //     _id: resData?.data?.createEvent?._id,
+        //     title: resData?.data?.createEvent?.title,
+        //     description: resData?.data?.createEvent?.description,
+        //     date: resData?.data?.createEvent?.date,
+        //     price: resData?.data?.createEvent?.price,
+        //     creator: {
+        //       _id: authContext?.userId
+        //     }
+        //   });
+        //   return updatedEvents
+        // });
       })
       .catch(err => {
         console.log(err);
@@ -98,9 +115,11 @@ function EventsPage() {
   const onPressCancel = () => {
     console.log('cancel'); // runs but then ... Events.js:115 POST http://localhost:8000/graphql net::ERR_CONNECTION_REFUSED
     setCreatingEvent(false);
+    setSelectedEvent(null);
   }
 
   const fetchEvents = () => {
+    setIsLoading(true);
     /*
     const requestBody = {
       query: `
@@ -143,25 +162,42 @@ function EventsPage() {
         const events = resData.data.events;
         console.log('setting events', events) // an empty array??
         setEvents(events);
+        setIsLoading(false);
       })
       .catch(err => {
         console.log(err);
+        setIsLoading(false);
       });
     */
 
     // hardcoding for now until that 500 error is figured out
-    const hardCodedEvents = [{title: "Hello", price: "89.1", date: "2021-04-24T19:52", description: "Victory"}]
-    setEvents(hardCodedEvents)
+    const hardCodedEvents = [
+      {title: "Hello", price: "89.1", date: "2021-04-24T19:52", description: "Victory"},
+      {title: "Frank", price: "81.1", date: "2021-04-24T19:52", description: "Never give up"}
+    ]
+    setEvents(hardCodedEvents);
+    setIsLoading(false);
   }
+
+  const showDetailHandler = eventId => {
+    setSelectedEvent(prevState => {
+      const selectedEvent = {title: "Hello", price: "89.1", date: "2021-04-24T19:52", description: "Victory"}
+      //const selectedEvent = prevState.events.find(e => e._id === eventId);
+      return selectedEvent;
+    })
+  }
+
+  const bookEventHandler = () => {};
 
   return (
     <>
-      {creatingEvent && <Backdrop />}
+      {(creatingEvent || selectedEvent) && <Backdrop />}
       {creatingEvent && (
         <Modal
           title="Add Event"
           canCancel
           canConfirm
+          confirmText='Confirm'
           onCancel={onPressCancel}
           onConfirm={onPressConfirm}
         >
@@ -189,6 +225,23 @@ function EventsPage() {
           </form>
         </Modal>
       )}
+      {selectedEvent && (
+          <Modal
+            title={selectedEvent.title}
+            canCancel
+            canConfirm
+            onCancel={onPressCancel}
+            onConfirm={bookEventHandler}
+            confirmText='Book'
+          >
+            <h1>{selectedEvent.title}</h1>
+            <h2>
+              ${selectedEvent.price} - {' '}
+              {new Date(selectedEvent.date).toLocaleDateString()}
+            </h2>
+            <p>{selectedEvent.description}</p>
+          </Modal>
+        )}
     {/*  {authContext.token && (
       <div className="events-control">
         <p>Share your own Events!</p>
@@ -203,7 +256,10 @@ function EventsPage() {
         Create Event
       </button>
     </div>
-    <EventList events={events} />
+    {/*
+      terneray operator to only display if isLoading is false
+      */}
+    <EventList events={events} authUserId={AuthContext.userId} onViewDetailPress={showDetailHandler} />
     </>
   );
 }

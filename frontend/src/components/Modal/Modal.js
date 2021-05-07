@@ -4,7 +4,7 @@ import './Modal.css';
 
 // TODO: add Typescript here for the props !!!!!
 
-const modal = props => (
+const Modal = props => (
   <div className="modal">
     <header className="modal__header">
       <h1>{props.title}</h1>
@@ -18,11 +18,11 @@ const modal = props => (
       )}
       {props.canConfirm && (
         <button className="btn" onClick={props.onConfirm}>
-          Confirm
+          {props.confirmText}
         </button>
       )}
     </section>
   </div>
 );
 
-export default modal;
+export default Modal;

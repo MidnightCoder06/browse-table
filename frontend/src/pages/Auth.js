@@ -1,4 +1,5 @@
 // TODO: use Apollo instead of fetch
+// make a more standard login / sign up process 
 
 import React, { useState, useRef, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
